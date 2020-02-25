@@ -2,7 +2,7 @@
 // This software may be modified and distributed under the terms
 // of the Apache-2.0 license. See the LICENSE file for details.
 
-import { AccountId, Balance, Points } from '@polkadot/types/interfaces';
+import { AccountId, Balance, RewardPoint } from '@polkadot/types/interfaces';
 import { DeriveAccountInfo, DerivedStakingQuery, DerivedHeartbeatAuthor } from '@polkadot/api-derive/types';
 import { ValidatorFilter } from '../types';
 
@@ -30,7 +30,8 @@ interface Props {
   isFavorite: boolean;
   lastBlock?: string;
   myAccounts: string[];
-  points?: Points;
+  points?: RewardPoint;
+  setNominators?: (nominators: string[]) => void;
   toggleFavorite: (accountId: string) => void;
   withNominations?: boolean;
 }
@@ -47,12 +48,12 @@ interface StakingState {
   stakeOwn?: BN;
 }
 
-function expandInfo ({ controllerId, nextSessionIds, stakers, validatorPrefs }: DerivedStakingQuery, myAccounts: string[], withNominations = true): StakingState {
-  const nominators = withNominations && stakers
-    ? stakers.others.map(({ who, value }): [AccountId, Balance] => [who, value.unwrap()])
+function expandInfo ({ controllerId, exposure, nextSessionIds, validatorPrefs }: DerivedStakingQuery, myAccounts: string[], withNominations = true): StakingState {
+  const nominators = withNominations && exposure
+    ? exposure.others.map(({ who, value }): [AccountId, Balance] => [who, value.unwrap()])
     : [];
-  const stakeTotal = (stakers && !stakers.total.isEmpty && stakers.total.unwrap()) || undefined;
-  const stakeOwn = (stakers && !stakers.own.isEmpty && stakers.own.unwrap()) || undefined;
+  const stakeTotal = (exposure && !exposure.total.isEmpty && exposure.total.unwrap()) || undefined;
+  const stakeOwn = (exposure && !exposure.own.isEmpty && exposure.own.unwrap()) || undefined;
   const stakeOther = (stakeTotal && stakeOwn) ? stakeTotal.sub(stakeOwn) : undefined;
   const commission = validatorPrefs?.commission?.unwrap();
 
@@ -113,7 +114,7 @@ function checkVisibility (api: ApiPromise, address: string, filterName: string, 
   return isVisible;
 }
 
-export default function Address ({ address, className, filter, filterName, hasQueries, heartbeat, isAuthor, isElected, isFavorite, lastBlock, myAccounts, points, toggleFavorite, withNominations }: Props): React.ReactElement<Props> | null {
+export default function Address ({ address, className, filter, filterName, hasQueries, heartbeat, isAuthor, isElected, isFavorite, lastBlock, myAccounts, points, setNominators, toggleFavorite, withNominations }: Props): React.ReactElement<Props> | null {
   const { t } = useTranslation();
   const { api } = useApi();
   // FIXME Any horrors, caused by derive type mismatches
@@ -124,9 +125,12 @@ export default function Address ({ address, className, filter, filterName, hasQu
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect((): void => {
-    stakingInfo && setStakingState(
-      expandInfo(stakingInfo, myAccounts, withNominations)
-    );
+    if (stakingInfo) {
+      const info = expandInfo(stakingInfo, myAccounts, withNominations);
+
+      setNominators && setNominators(info.nominators.map(([who]): string => who.toString()));
+      setStakingState(info);
+    }
   }, [stakingInfo]);
 
   useEffect((): void => {
@@ -193,7 +197,7 @@ export default function Address ({ address, className, filter, filterName, hasQu
         )}
       </td>
       <td className={'toggle number'} colSpan={isExpanded ? 5 : 1} onClick={_toggleNominators}>
-        {stakeOther && (
+        {stakeOther?.gtn(0) && (
           isExpanded
             ? (
               <div>
@@ -225,7 +229,7 @@ export default function Address ({ address, className, filter, filterName, hasQu
             )}
           </td>
           <td className='number'>
-            {points && points.gtn(0) && (
+            {points?.gtn(0) && (
               <><label>{t('points')}</label>{formatNumber(points)}</>
             )}
           </td>

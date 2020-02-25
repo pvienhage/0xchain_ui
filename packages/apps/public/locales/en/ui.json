@@ -867,5 +867,9 @@
   "no addresses saved yet, add any existing address": "",
   "0.1x voting balance, no lockup period": "",
   "{{value}}x voting balance, locked for {{lock}}x enactment ({{period}} days)": "",
-  "all available": ""
+  "all available": "",
+  "recovery threshold": "",
+  "recovery block delay": "",
+  "Uncaught error. Something went wrong with the query and rendering of this component.": "",
+  "validators/nominators": ""
 }

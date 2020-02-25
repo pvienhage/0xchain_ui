@@ -23,6 +23,7 @@ interface Props {
   lastAuthors?: string[];
   next: string[];
   recentlyOnline?: DerivedHeartbeats;
+  setNominators: (nominators: string[]) => void;
   stakingOverview?: DerivedStakingOverview;
 }
 
@@ -64,7 +65,7 @@ function reduceDetails (state: Record<string, AddressDetails>, _details: Address
   }, { ...state });
 }
 
-export default function CurrentList ({ authorsMap, hasQueries, isIntentions, isVisible, lastAuthors, next, recentlyOnline, stakingOverview }: Props): React.ReactElement<Props> | null {
+export default function CurrentList ({ authorsMap, hasQueries, isIntentions, isVisible, lastAuthors, next, recentlyOnline, setNominators, stakingOverview }: Props): React.ReactElement<Props> | null {
   const { t } = useTranslation();
   const { allAccounts } = useAccounts();
   const [favorites, toggleFavorite] = useFavorites(STORE_FAVS_BASE);
@@ -84,7 +85,7 @@ export default function CurrentList ({ authorsMap, hasQueries, isIntentions, isV
 
   useEffect((): void => {
     if (isVisible && stakingOverview) {
-      const allElected = accountsToString(stakingOverview.currentElected);
+      const allElected = accountsToString(stakingOverview.nextElected);
       const _validators = accountsToString(stakingOverview.validators);
       const validators = filterAccounts(_validators, allElected, favorites, []);
       const elected = filterAccounts(allElected, allElected, favorites, _validators);
@@ -96,17 +97,21 @@ export default function CurrentList ({ authorsMap, hasQueries, isIntentions, isV
         waiting: filterAccounts(next, [], favorites, allElected)
       });
     }
-  }, [favorites, isVisible, next, stakingOverview?.currentElected, stakingOverview?.validators]);
+  }, [favorites, isVisible, next, stakingOverview?.nextElected, stakingOverview?.validators]);
 
   useEffect((): void => {
-    if (stakingOverview) {
+    if (stakingOverview?.eraPoints) {
+      const allPoints = stakingOverview.eraPoints
+        ? [...stakingOverview.eraPoints.individual.entries()]
+        : [];
+
       dispatchDetails(validators.map(([address]): AddressDetails => {
-        const electedIdx = allElected.indexOf(address);
+        const points = allPoints.find(([accountId]): boolean => accountId.eq(address));
 
         return {
           address,
-          points: electedIdx !== -1
-            ? stakingOverview.eraPoints?.individual[electedIdx]
+          points: points
+            ? points[1]
             : undefined
         };
       }));
@@ -137,6 +142,7 @@ export default function CurrentList ({ authorsMap, hasQueries, isIntentions, isV
             ? addressDetails[address] && addressDetails[address].points
             : undefined
         }
+        setNominators={isIntentions ? undefined : setNominators}
         toggleFavorite={toggleFavorite}
       />
     ));

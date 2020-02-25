@@ -3,5 +3,8 @@
 // of the Apache-2.0 license. See the LICENSE file for details.
 
 export default {
-  Keys: 'SessionKeys5'
+  Address: 'GenericAddress',
+  BalanceLock: 'BalanceLockTo212',
+  Keys: 'SessionKeys5',
+  StakingLedger: 'StakingLedgerTo223'
 };
