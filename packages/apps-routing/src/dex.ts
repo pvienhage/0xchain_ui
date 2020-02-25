@@ -4,11 +4,11 @@
 
 import { Routes } from './types';
 
-import Template from '@polkadot/app-123code';
+import Dex from '@polkadot/app-dex';
 
 export default ([
   {
-    Component: Template,
+    Component: Dex,
     display: {
       isHidden: false,
       needsAccounts: true,
@@ -17,9 +17,9 @@ export default ([
       ]
     },
     i18n: {
-      defaultValue: 'Template'
+      defaultValue: 'Exchange'
     },
-    icon: 'th',
-    name: '123code'
+    icon: 'exchange',
+    name: 'dex'
   }
 ] as Routes);

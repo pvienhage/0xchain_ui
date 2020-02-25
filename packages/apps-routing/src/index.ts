@@ -6,6 +6,7 @@ import { Routing, Routes } from './types';
 
 import appSettings from '@polkadot/ui-settings';
 
+import dex from './dex';
 import template from './123code';
 import accounts from './accounts';
 import addressbook from './addressbook';
@@ -34,44 +35,45 @@ const routes: Routes = appSettings.uiMode === 'light'
     // dashboard,
     explorer,
     accounts,
-    addressbook,
-    claims,
+    // addressbook,
+    dex,
     transfer,
-    genericAsset,
-    null,
-    staking,
-    democracy,
-    council,
-    // TODO Not sure about the inclusion of treasury, parachains & society here
-    null,
+    // genericAsset,
+    // null,
+    // staking,
+    // democracy,
+    // council,
+    // // TODO Not sure about the inclusion of treasury, parachains & society here
+    // null,
     settings
   )
   : ([] as Routes).concat(
     // dashboard,
     explorer,
     accounts,
-    addressbook,
-    claims,
+    // addressbook,
+    dex,
+    // claims,
     transfer,
-    genericAsset,
-    null,
-    staking,
-    democracy,
-    council,
-    treasury,
-    techcomm,
-    parachains,
-    society,
-    null,
-    contracts,
-    storage,
+    // genericAsset,
+    // null,
+    // staking,
+    // democracy,
+    // council,
+    // treasury,
+    // techcomm,
+    // parachains,
+    // society,
+    // null,
+    // contracts,
+    // storage,
     extrinsics,
     sudo,
     null,
     settings,
     toolbox,
     js,
-    template
+    template,
   );
 
 const setup: Routing = {

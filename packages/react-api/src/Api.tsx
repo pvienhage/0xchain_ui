@@ -16,6 +16,7 @@ import ApiSigner from '@polkadot/react-signer/ApiSigner';
 import { createType } from '@polkadot/types';
 import { formatBalance, isTestChain } from '@polkadot/util';
 import addressDefaults from '@polkadot/util-crypto/address/defaults';
+import { TypeRegistry } from '@polkadot/types';
 
 import typesChain from './overrides/chain';
 import typesSpec from './overrides/spec';
@@ -120,6 +121,57 @@ export default function Api ({ children, url }: Props): React.ReactElement<Props
     const provider = new WsProvider(url);
     const signer = new ApiSigner(queuePayload, queueSetTxStatus);
 
+    registry.register({RecordedProof: {
+          proof: 'Vec<u8>',
+          public: 'Claim',
+      },
+      HashContainer: {
+          hash: '[u8; 32]',
+      },
+      "dex::PublicKey": {
+          x: '[u8; 32]',
+          y: '[u8; 32]',
+      },
+      "dex::Signature": {
+          r: '[u8; 32]',
+          w: '[u8; 32]',
+      },
+      Vault: {
+          owner: 'dex::PublicKey',
+          token_id: '[u8; 24]',
+          balance: 'u64',
+      },
+      "eth::Address": "[u8; 20]",
+      "eth::Signature": "[u8; 65]",
+      MakerMessage: {
+          vault_a: 'u32',
+          vault_b: 'u32',
+          amount_a: 'u64',
+          amount_b: 'u64',
+          token_a: '[u8; 24]',
+          token_b: '[u8; 24]',
+          trade_id: 'u32',
+          sig: 'dex::Signature',
+      },
+      TakerMessage: {
+          maker_message: 'MakerMessage',
+          vault_a: 'u32',
+          vault_b: 'u32',
+      },
+      Claim: {
+          n_transactions:      'u32',
+          modifications:       'Vec<Modification>',
+          initial_vaults_root: '[u8; 32]',
+          final_vaults_root:   '[u8; 32]',
+      },
+      Modification: {
+          initial_amount: 'u32',
+          final_amount:   'u32',
+          index:          'u32',
+          key:            '[u8; 32]',
+          token:          '[u8; 32]',
+          vault:          'u32',
+      }});
     api = new ApiPromise({ provider, registry, signer, typesChain, typesSpec });
 
     api.on('connected', (): void => setIsApiConnected(true));

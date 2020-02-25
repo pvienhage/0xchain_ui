@@ -1,0 +1,15 @@
+{
+  "name": "@polkadot/app-dex",
+  "version": "0.40.0-beta.11",
+  "description": "The entrypoint to the 0xchain dex",
+  "main": "index.js",
+  "scripts": {},
+  "author": "Paul Vienhage <paul@0x.org>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@babel/runtime": "^7.8.3",
+    "@polkadot/react-components": "^0.40.0-beta.11",
+    "@polkadot/react-qr": "^0.49.0-beta.2",
+    "ethers": "^4.0.44"
+  }
+}
